@@ -11,13 +11,13 @@
 
 /**
  * getRobotPositionEstimate()
- * This function is called by the controller to retrieve the current 
- * robot position estimate. 
+ * This function is called by the controller to retrieve the current
+ * robot position estimate.
  */
 void getRobotPositionEstimate(RobotState& estimatePosn)
 {
     // TODO: Write your procedures to set the current robot position estimate here
-    
+
 //    estimatePosn.x = 0.0;
 //    estimatePosn.y = 0.0;
 //    estimatePosn.theta = 0.0;
@@ -26,40 +26,40 @@ void getRobotPositionEstimate(RobotState& estimatePosn)
 /**
  * motionUpdate()
  * This function is called every time the position of the robot is
- * updated. The argument passed is the relative change in position of the 
- * robot in local robot coordinates (observed by odometry model), which 
+ * updated. The argument passed is the relative change in position of the
+ * robot in local robot coordinates (observed by odometry model), which
  * may be subject to noise (according to motion model parameters).
  */
 void motionUpdate(RobotState delta)
 {
     // TODO: Write your motion update procedures here
-    
+
 }
 
 /**
  * sensorUpdate()
  * This function is called every time the robot detects one or more
- * landmarks in its field of view. The argument passed contains all 
- * marker obervations (marker index and position of marker in robot 
+ * landmarks in its field of view. The argument passed contains all
+ * marker obervations (marker index and position of marker in robot
  * coordinates) for the current frame.
  */
 void sensorUpdate(std::vector<MarkerObservation> observations)
 {
     // TODO: Write your sensor update procedures here
-    
+
 }
 
 /**
  * myinit()
- * Initialization function that takes as input the initial 
+ * Initialization function that takes as input the initial
  * robot state (position and orientation), and the locations
  * of each landmark (global x,y coordinates).
  */
-void myinit(RobotState robotState, RobotParams robotParams, 
+void myinit(RobotState robotState, RobotParams robotParams,
             FieldLocation markerLocations[NUM_LANDMARKS])
 {
     // TODO: Write your initialization procedures here
-    
+
 }
 
 /**
@@ -69,16 +69,16 @@ void myinit(RobotState robotState, RobotParams robotParams,
  */
 void mydisplay()
 {
-    // TODO: Write your drawing procedures here 
+    // TODO: Write your drawing procedures here
     //       (e.g., robot position uncertainty representation)
-    
-    
+
+
 //    // Example drawing procedure
     //int pixelX, pixelY;
     //double globalX = 1.0, globalY = -1.0;
     //const int NUM_POINTS = 8;
     //const double POINT_SPREAD = 0.2;
-    
+
     //// Draw cyan colored points at specified global locations on field
     //glBegin(GL_POINTS);
     //glColor3f(0.0, 1.0, 1.0);
@@ -93,7 +93,7 @@ void mydisplay()
 /**
  * mykeyboard()
  * This function is called whenever a keyboard key is pressed, after
- * the controller has processed the input. It receives the ASCII value 
+ * the controller has processed the input. It receives the ASCII value
  * of the key that was pressed.
  *
  * Return value: 1 if window re-draw requested, 0 otherwise
@@ -101,7 +101,7 @@ void mydisplay()
 int mykeyboard(unsigned char key)
 {
     // TODO: (Optional) Write your keyboard input handling procedures here
-	
+
 	return 0;
 }
 

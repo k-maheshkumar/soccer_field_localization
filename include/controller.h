@@ -3,8 +3,8 @@
 
 #include "robot_defs.h"
 
-// Initializes robot state and marker locations, 
-// sets up OpenGL window management, then calls user-defined 
+// Initializes robot state and marker locations,
+// sets up OpenGL window management, then calls user-defined
 // myinit() function before starting main controller loop
 void runMainLoop(int argc, char** argv);
 
