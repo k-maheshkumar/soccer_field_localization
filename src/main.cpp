@@ -1,13 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include "main.h"
+#include "controller.h"
+#include "robot_defs.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <vector>
-#include "robot_defs.h"
-#include "controller.h"
-#include "main.h"
 
 /**
  * getRobotPositionEstimate()
@@ -18,9 +18,9 @@ void getRobotPositionEstimate(RobotState& estimatePosn)
 {
     // TODO: Write your procedures to set the current robot position estimate here
 
-//    estimatePosn.x = 0.0;
-//    estimatePosn.y = 0.0;
-//    estimatePosn.theta = 0.0;
+    //    estimatePosn.x = 0.0;
+    //    estimatePosn.y = 0.0;
+    //    estimatePosn.theta = 0.0;
 }
 
 /**
@@ -33,7 +33,6 @@ void getRobotPositionEstimate(RobotState& estimatePosn)
 void motionUpdate(RobotState delta)
 {
     // TODO: Write your motion update procedures here
-
 }
 
 /**
@@ -46,7 +45,6 @@ void motionUpdate(RobotState delta)
 void sensorUpdate(std::vector<MarkerObservation> observations)
 {
     // TODO: Write your sensor update procedures here
-
 }
 
 /**
@@ -55,11 +53,9 @@ void sensorUpdate(std::vector<MarkerObservation> observations)
  * robot state (position and orientation), and the locations
  * of each landmark (global x,y coordinates).
  */
-void myinit(RobotState robotState, RobotParams robotParams,
-            FieldLocation markerLocations[NUM_LANDMARKS])
+void myinit(RobotState robotState, RobotParams robotParams, FieldLocation markerLocations[NUM_LANDMARKS])
 {
     // TODO: Write your initialization procedures here
-
 }
 
 /**
@@ -72,22 +68,20 @@ void mydisplay()
     // TODO: Write your drawing procedures here
     //       (e.g., robot position uncertainty representation)
 
-
-//    // Example drawing procedure
-    //int pixelX, pixelY;
-    //double globalX = 1.0, globalY = -1.0;
-    //const int NUM_POINTS = 8;
-    //const double POINT_SPREAD = 0.2;
+    //    // Example drawing procedure
+    // int pixelX, pixelY;
+    // double globalX = 1.0, globalY = -1.0;
+    // const int NUM_POINTS = 8;
+    // const double POINT_SPREAD = 0.2;
 
     //// Draw cyan colored points at specified global locations on field
-    //glBegin(GL_POINTS);
-    //glColor3f(0.0, 1.0, 1.0);
-    //for(int i=0; i<NUM_POINTS; i++){
-    //    global2pixel(globalX, globalY + (i * POINT_SPREAD), pixelX, pixelY);
-    //    glVertex2i(pixelX, pixelY);
-    //}
-    //glEnd();
-
+    // glBegin(GL_POINTS);
+    // glColor3f(0.0, 1.0, 1.0);
+    // for(int i=0; i<NUM_POINTS; i++){
+    //     global2pixel(globalX, globalY + (i * POINT_SPREAD), pixelX, pixelY);
+    //     glVertex2i(pixelX, pixelY);
+    // }
+    // glEnd();
 }
 
 /**
@@ -102,14 +96,13 @@ int mykeyboard(unsigned char key)
 {
     // TODO: (Optional) Write your keyboard input handling procedures here
 
-	return 0;
+    return 0;
 }
-
 
 /**
  * Main entrypoint for the program.
  */
-int main (int argc, char ** argv)
+int main(int argc, char** argv)
 {
     // Initialize world, sets initial robot position
     // calls myinit() before returning
@@ -117,4 +110,3 @@ int main (int argc, char ** argv)
 
     return 0;
 }
-

@@ -1,8 +1,8 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-#include <vector>
 #include "robot_defs.h"
+#include <vector>
 
 // Sets current robot position estimate
 void getRobotPositionEstimate(RobotState& estimatePosn);
@@ -14,9 +14,8 @@ void motionUpdate(RobotState delta);
 void sensorUpdate(std::vector<MarkerObservation> observations);
 
 // Initialization and UI methods
-void myinit(RobotState robotState, RobotParams robotParams,
-            FieldLocation markerLocations[NUM_LANDMARKS]);
+void myinit(RobotState robotState, RobotParams robotParams, FieldLocation markerLocations[NUM_LANDMARKS]);
 void mydisplay();
-int  mykeyboard(unsigned char key);
+int mykeyboard(unsigned char key);
 
 #endif
