@@ -49,11 +49,11 @@ find_library(
   NAMES controller
   HINTS "${CMAKE_SOURCE_DIR}/lib")
 
-add_library(localization src/PfModel.cpp src/ParticleFilter.cpp
-                         src/Localization.cpp)
-target_include_directories(localization PRIVATE include)
+add_library(localization_lib src/PfModel.cpp src/ParticleFilter.cpp
+                             src/Localization.cpp)
+target_include_directories(localization_lib PRIVATE include)
 
-add_executable(localization_test src/utils.cpp src/main.cpp)
-target_include_directories(localization_test PRIVATE include)
-target_link_libraries(localization_test PRIVATE localization ${controller}
-                                                GLUT::GLUT OpenGL::OpenGL)
+add_executable(localization src/utils.cpp src/main.cpp)
+target_include_directories(localization PRIVATE include)
+target_link_libraries(localization PRIVATE localization_lib ${controller}
+                                           GLUT::GLUT OpenGL::OpenGL)
