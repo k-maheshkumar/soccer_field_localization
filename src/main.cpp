@@ -1,13 +1,19 @@
 #include "main.h"
 #include "controller.h"
+#include "Localization.hpp"
 #include "robot_defs.h"
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+#include <iostream>
 #include <math.h>
+#include <memory>
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+
+std::unique_ptr<soccer_field_localization::Localization> localization;
 
 /**
  * getRobotPositionEstimate()
@@ -16,11 +22,7 @@
  */
 void getRobotPositionEstimate(RobotState& estimatePosn)
 {
-    // TODO: Write your procedures to set the current robot position estimate here
-
-    //    estimatePosn.x = 0.0;
-    //    estimatePosn.y = 0.0;
-    //    estimatePosn.theta = 0.0;
+    localization->getState(estimatePosn);
 }
 
 /**
@@ -32,7 +34,7 @@ void getRobotPositionEstimate(RobotState& estimatePosn)
  */
 void motionUpdate(RobotState delta)
 {
-    // TODO: Write your motion update procedures here
+    localization->motionUpdate(delta);
 }
 
 /**
@@ -44,7 +46,7 @@ void motionUpdate(RobotState delta)
  */
 void sensorUpdate(std::vector<MarkerObservation> observations)
 {
-    // TODO: Write your sensor update procedures here
+    localization->sensorUpdate(observations);
 }
 
 /**
@@ -55,7 +57,14 @@ void sensorUpdate(std::vector<MarkerObservation> observations)
  */
 void myinit(RobotState robotState, RobotParams robotParams, FieldLocation markerLocations[NUM_LANDMARKS])
 {
-    // TODO: Write your initialization procedures here
+    std::array<FieldLocation, NUM_LANDMARKS> fieldLocations;
+    for (size_t i = 0; i < NUM_LANDMARKS; ++i)
+    {
+        fieldLocations[i] = markerLocations[i];
+    }
+
+    localization = std::make_unique<soccer_field_localization::Localization>(robotParams, fieldLocations);
+    localization->init(robotState);
 }
 
 /**
@@ -82,6 +91,19 @@ void mydisplay()
     //     glVertex2i(pixelX, pixelY);
     // }
     // glEnd();
+
+    // Draw red colored points at specified global locations on field
+    glBegin(GL_POINTS);
+    glColor3f(0.0, 1.0, 1.0);
+    const auto drawFunction{[&](const RobotState& state) {
+        int pixelX, pixelY;
+        global2pixel(state.x, state.y, pixelX, pixelY);
+        glVertex2i(pixelX, pixelY);
+    }};
+
+    localization->visualize(drawFunction);
+
+    glEnd();
 }
 
 /**
@@ -92,7 +114,8 @@ void mydisplay()
  *
  * Return value: 1 if window re-draw requested, 0 otherwise
  */
-int mykeyboard(unsigned char key)
+// int mykeyboard(unsigned char key)
+int mykeyboard(unsigned char)
 {
     // TODO: (Optional) Write your keyboard input handling procedures here
 
