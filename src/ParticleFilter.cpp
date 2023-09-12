@@ -12,18 +12,19 @@
 
 namespace soccer_field_localization
 {
-ParticleFilter::ParticleFilter(const size_t _numberOfParticles,
+ParticleFilter::ParticleFilter(const ParticleFilterParams& _particleFilterParams,
                                const std::array<FieldLocation, NUM_LANDMARKS>& _markerLocations,
                                std::unique_ptr<PfModel> _pfModel) :
+    particleFilterParams{_particleFilterParams},
     markerLocations{_markerLocations},
     pfModel{std::move(_pfModel)}
 {
-    particles[priorSetIndex].reserve(_numberOfParticles);
-    particles[updatedSetIndex].reserve(_numberOfParticles);
+    assert(particleFilterParams.numberOfParticles > 0);
 
-    assert(_numberOfParticles > 0);
+    particles[priorSetIndex].reserve(particleFilterParams.numberOfParticles);
+    particles[updatedSetIndex].reserve(particleFilterParams.numberOfParticles);
 
-    for (uint32_t i = 0; i < _numberOfParticles; i++)
+    for (uint32_t i = 0; i < particleFilterParams.numberOfParticles; i++)
     {
         const auto particle = generateRandomSample();
         particles[priorSetIndex].emplace_back(particle);
@@ -33,17 +34,15 @@ ParticleFilter::ParticleFilter(const size_t _numberOfParticles,
 
 std::pair<RobotState, ParticleFilter::Weight> ParticleFilter::generateRandomSample() const
 {
-    const double halfLength{FIELD_LENGTH / (2.0 * PIXELS_PER_METER)};
-    const double halfWidth{FIELD_WIDTH / (2.0 * PIXELS_PER_METER)};
+    auto randomX = std::uniform_real_distribution<>(0, static_cast<double>(particleFilterParams.worldXSize));
+    auto randomY = std::uniform_real_distribution<>(0, static_cast<double>(particleFilterParams.worldYSize));
 
-    auto random_x = std::uniform_real_distribution<>(-halfLength, halfLength);
-    auto random_y = std::uniform_real_distribution<>(-halfWidth, halfWidth);
     auto random_yaw = std::uniform_real_distribution<>(-M_PI, M_PI);
     auto random_weight = std::uniform_real_distribution<>(0, 1.0);
 
     RobotState state;
-    state.x = random_x(mersenne);
-    state.y = random_y(mersenne);
+    state.x = randomX(mersenne);
+    state.y = randomY(mersenne);
     state.theta = random_yaw(mersenne);
     const double weight = random_weight(mersenne);
     return {state, weight};
@@ -69,16 +68,9 @@ void ParticleFilter::init(const RobotState& intialState, const MarkerObservation
 
 void ParticleFilter::motionUpdate(const RobotState& delta)
 {
-    const double halfLength{FIELD_LENGTH / (2.0 * PIXELS_PER_METER)};
-    const double halfWidth{FIELD_WIDTH / (2.0 * PIXELS_PER_METER)};
-
     for (auto& [particle, weight] : particles[priorSetIndex])
     {
         particle = pfModel->predict(particle, delta);
-        particle.x = fmax(-halfLength, particle.x);
-        particle.y = fmax(-halfWidth, particle.y);
-        particle.x = fmin(halfLength, particle.x);
-        particle.y = fmin(halfWidth, particle.y);
     }
 }
 
@@ -97,11 +89,6 @@ void ParticleFilter::sensorUpdate(const std::vector<MarkerObservation> observati
     normalizeWeights(totalWeight);
     resample();
     updateMean();
-
-    while (particles[updatedSetIndex].size() < particles[priorSetIndex].size())
-    {
-        particles[updatedSetIndex].push_back(generateRandomSample());
-    }
 
     particles[priorSetIndex] = particles[updatedSetIndex];
 }
@@ -171,7 +158,7 @@ void ParticleFilter::normalizeWeights(const double totalWeight)
 // reference: https://www.youtube.com/watch?v=wNQVo6uOgYA
 void ParticleFilter::resample()
 {
-
+    double avgWeight = 0;
     double maxWeight = std::numeric_limits<double>::min();
     const auto& updatedParticles = particles[updatedSetIndex];
 
@@ -183,8 +170,30 @@ void ParticleFilter::resample()
         if (updatedParticles[i].second > maxWeight)
         {
             maxWeight = updatedParticles[i].second;
+            avgWeight += updatedParticles[i].second;
         }
     }
+
+    avgWeight /= static_cast<double>(updatedParticles.size());
+
+    if (weightSlow == 0.0)
+    {
+        weightSlow = avgWeight;
+    }
+    else
+    {
+        weightSlow += particleFilterParams.particleSlowRecoveryFactor * (avgWeight - weightSlow);
+    }
+    if (weightFast == 0.0)
+    {
+        weightFast = avgWeight;
+    }
+    else
+    {
+        weightFast += particleFilterParams.particleFastRecoveryFactor * (avgWeight - weightFast);
+    }
+
+    const double weightDiff = std::max(0.0, 1.0 - weightFast / weightSlow);
 
     auto randomDouble{std::uniform_real_distribution<>(0.0, 2.0 * maxWeight)};
     size_t bestIndex{std::uniform_int_distribution<size_t>(0, updatedParticles.size() - 1)(mersenne)};
@@ -193,14 +202,26 @@ void ParticleFilter::resample()
 
     for (size_t index{0}; index < updatedParticles.size(); ++index)
     {
-        beta += randomDouble(mersenne);
-
-        while (beta > updatedParticles[bestIndex].second)
+        if (randomDouble(mersenne) < weightDiff)
         {
-            beta -= updatedParticles[bestIndex].second;
-            bestIndex = (bestIndex + 1) % updatedParticles.size();
+            resampledParticles.push_back(generateRandomSample());
         }
-        resampledParticles.push_back(updatedParticles[bestIndex]);
+        else
+        {
+            beta += randomDouble(mersenne);
+
+            while (beta > updatedParticles[bestIndex].second)
+            {
+                beta -= updatedParticles[bestIndex].second;
+                bestIndex = (bestIndex + 1) % updatedParticles.size();
+            }
+            resampledParticles.push_back(updatedParticles[bestIndex]);
+        }
+
+        if (weightDiff > 0.0)
+        {
+            weightSlow = weightFast = 0.0;
+        }
     }
 
     particles[updatedSetIndex] = resampledParticles;

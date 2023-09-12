@@ -10,6 +10,16 @@
 
 namespace soccer_field_localization
 {
+
+struct ParticleFilterParams
+{
+    const size_t worldXSize;
+    const size_t worldYSize;
+    const size_t numberOfParticles;
+    const double particleSlowRecoveryFactor;
+    const double particleFastRecoveryFactor;
+};
+
 class ParticleFilter
 {
 public:
@@ -19,13 +29,15 @@ public:
     /*
      *Particle filter constructor
      *@param _numberOfParticles number of particles to approximate the posterior distribution
+     *@param _particleSlowRecoveryFactor Slow average weight exponential decay factor to recover by adding random poses
+     *@param _particleFastRecoveryFactor Fast average weight exponential decay factor to recover by adding random poses
      *@param _markerLocations location of markers with respect to map
      *@param _pfModel motion model of the robot
      *@param _sensorNoiseDistance The sensor noise in range measurement
      *@param _sensorNoiseOrientation The sensor noise in bearing measurement
      */
-    ParticleFilter(const size_t _numberOfParticles, const std::array<FieldLocation, NUM_LANDMARKS>& _markerLocations,
-                   std::unique_ptr<PfModel> _pfModel);
+    ParticleFilter(const ParticleFilterParams& _particleFilterParams,
+                   const std::array<FieldLocation, NUM_LANDMARKS>& _markerLocations, std::unique_ptr<PfModel> _pfModel);
 
     /*
      *This method intialize the particles around the given intial state.
@@ -81,6 +93,7 @@ private:
     void updateMean();
 
     mutable std::mt19937 mersenne{std::random_device{}()};
+    const ParticleFilterParams particleFilterParams;
     std::array<FieldLocation, NUM_LANDMARKS> markerLocations;
     std::unique_ptr<PfModel> pfModel;
 

@@ -7,12 +7,17 @@ namespace soccer_field_localization
 {
 
 const static int NUMBER_OF_PARTICLES = 10000;
+const static double PARTICLE_SLOW_RECOVERY_FACTOR = 0.001;
+const static double PARTICLE_FAST_RECOVERY_FACTOR = 0.1;
 
 Localization::Localization(const RobotParams& _robotParams,
                            const std::array<FieldLocation, NUM_LANDMARKS>& _markerLocations) :
     observationNoise{-1, _robotParams.sensor_noise_distance, _robotParams.sensor_noise_orientation},
     particleFilter{
-        NUMBER_OF_PARTICLES, _markerLocations,
+        ParticleFilterParams{static_cast<size_t>(FIELD_LENGTH / (2.0 * PIXELS_PER_METER)),
+                             static_cast<size_t>(FIELD_WIDTH / (2.0 * PIXELS_PER_METER)), NUMBER_OF_PARTICLES,
+                             PARTICLE_SLOW_RECOVERY_FACTOR, PARTICLE_SLOW_RECOVERY_FACTOR},
+        _markerLocations,
         std::move(std::unique_ptr<soccer_field_localization::PfModel>{
             std::make_unique<soccer_field_localization::PfModel>(_robotParams.odom_noise_rotation_from_rotation,
                                                                  _robotParams.odom_noise_rotation_from_translation,
