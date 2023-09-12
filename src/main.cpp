@@ -14,6 +14,7 @@
 #include <vector>
 
 std::unique_ptr<soccer_field_localization::Localization> localization;
+bool visualize{false};
 
 /**
  * getRobotPositionEstimate()
@@ -74,24 +75,11 @@ void myinit(RobotState robotState, RobotParams robotParams, FieldLocation marker
  */
 void mydisplay()
 {
-    // TODO: Write your drawing procedures here
-    //       (e.g., robot position uncertainty representation)
-
-    //    // Example drawing procedure
-    // int pixelX, pixelY;
-    // double globalX = 1.0, globalY = -1.0;
-    // const int NUM_POINTS = 8;
-    // const double POINT_SPREAD = 0.2;
-
-    //// Draw cyan colored points at specified global locations on field
-    // glBegin(GL_POINTS);
-    // glColor3f(0.0, 1.0, 1.0);
-    // for(int i=0; i<NUM_POINTS; i++){
-    //     global2pixel(globalX, globalY + (i * POINT_SPREAD), pixelX, pixelY);
-    //     glVertex2i(pixelX, pixelY);
-    // }
-    // glEnd();
-
+    if (!visualize)
+    {
+        return;
+    }
+    
     // Draw red colored points at specified global locations on field
     glBegin(GL_POINTS);
     glColor3f(0.0, 1.0, 1.0);
@@ -115,9 +103,12 @@ void mydisplay()
  * Return value: 1 if window re-draw requested, 0 otherwise
  */
 // int mykeyboard(unsigned char key)
-int mykeyboard(unsigned char)
+int mykeyboard(unsigned char key)
 {
-    // TODO: (Optional) Write your keyboard input handling procedures here
+    if (key == 'p' || key == 'P')
+    {
+        visualize = !visualize;
+    }
 
     return 0;
 }
